@@ -15,11 +15,18 @@ Including another URLconf
 """
 # from django.contrib import admin
 from django.urls import path
-from app.views import login, index
+from app.views import login, \
+    index, create_user, nalist, \
+    logout, delete_nalist, add_nalist
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('', login),
     path('login', login),
-    path('index', index)
+    path('logout', logout),
+    path('index', index),
+    path('create', create_user),
+    path('list', nalist),
+    path('delete', delete_nalist),
+    path('add', add_nalist)
 ]
