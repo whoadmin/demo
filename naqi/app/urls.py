@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import path
 from app.views import login, \
     index, create_user, nalist, \
-    logout, delete_nalist, add_nalist
+    logout, delete_nalist, add_nalist, user_list, user_delete
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -26,7 +26,9 @@ urlpatterns = [
     path('logout', logout),
     path('index', index),
     path('create', create_user),
-    path('list', nalist),
-    path('delete', delete_nalist),
-    path('add', add_nalist)
+    path('naList', nalist),
+    path('naDelete', delete_nalist),
+    path('naAdd', add_nalist),
+    path('userList', user_list),
+    path('userDelete', user_delete),
 ]

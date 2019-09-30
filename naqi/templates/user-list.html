@@ -7,7 +7,7 @@
                     <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
                         <div class="widget am-cf">
                             <div class="widget-head am-cf">
-                                <div class="widget-title  am-cf">网络准入</div>
+                                <div class="widget-title  am-cf">用户管理</div>
                             </div>
                             <div class="widget-body  am-fr">
 
@@ -15,7 +15,7 @@
                                     <div class="am-form-group">
                                         <div class="am-btn-toolbar">
                                             <div class="am-btn-group am-btn-group-xs">
-                                                <button type="button" class="am-btn am-btn-default am-btn-success" onclick="addNa()">
+                                                <button type="button" class="am-btn am-btn-default am-btn-success">
                                                     <span class="am-icon-plus"></span>
                                                     新增
                                                 </button>
@@ -29,71 +29,53 @@
 
                                 <div class="am-u-sm-12 am-u-md-6 am-u-lg-3">
                                     <div class="am-form-group tpl-table-list-select">
-                                        <select id="type" data-am-selected="{btnSize: 'sm'}">
-                                          <option>所有类别</option>
-                                          <option value="name">姓名</option>
-                                          <option value="hid">主机id</option>
-                                          <option value="email">邮箱</option>
-                                          <option value="ip">ip地址</option>
-                                        </select>
+{#                                        <select id="type" data-am-selected="{btnSize: 'sm'}">#}
+{#                                          <option>所有类别</option>#}
+{#                                          <option value="name">姓名</option>#}
+{#                                          <option value="hid">主机id</option>#}
+{#                                          <option value="email">邮箱</option>#}
+{#                                          <option value="ip">ip地址</option>#}
+{#                                        </select>#}
                                     </div>
                                 </div>
                                 <div class="am-u-sm-12 am-u-md-12 am-u-lg-3">
                                     <div class="am-input-group am-input-group-sm tpl-form-border-form cl-p">
-                                        <input type="text" class="am-form-field" id="query">
+                                        <input type="text" class="am-form-field" id="query" placeholder="请输入用户名或账号">
                                         <span class="am-input-group-btn">
                                             <button class="am-btn  am-btn-default am-btn-success tpl-table-list-field am-icon-search"
-                                                    type="button" onclick="search()">
+                                                    type="button">
                                             </button>
                                         </span>
                                     </div>
                                 </div>
 
                                 <div class="am-u-sm-12">
-                                    <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black " id="example-r">
+                                    <table width="100%" class="am-table am-table-compact am-table-striped tpl-table-black" id="example-r">
                                         <thead>
                                             <tr>
-                                                <th>HostId</th>
-                                                <th>IP</th>
-                                                <th>MAC</th>
-                                                <th>DHCP服务器</th>
-                                                <th>DHCP主机</th>
-                                                <th>NBT域名</th>
-                                                <th>姓名</th>
-                                                <th>域账号</th>
-                                                <th>Email</th>
-                                                <th>标题</th>
-                                                <th>部门</th>
-                                                <th>电话</th>
-                                                <th>链接</th>
-                                                <th>标签</th>
-                                                <th>更新时间</th>
+                                                <th>用户名</th>
+                                                <th>账号</th>
+                                                <th>权限</th>
+                                                <th>创建时间</th>
                                                 <th>操作</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {% for item in data %}
                                             <tr class="gradeX">
-                                                <td>{{ item.hostid }}</td>
-                                                <td>{{ item.ip }}</td>
-                                                <td>{{ item.mac }}</td>
-                                                <td>{{ item.dhcp_server }}</td>
-                                                <td>{{ item.dhcp_hostname }}</td>
-                                                <td>{{ item.nbtdomain }}</td>
-                                                <td>{{ item.ad_displayname }}</td>
-                                                <td>{{ item.ad_name }}</td>
-                                                <td>{{ item.ad_mail }}</td>
-                                                <td>{{ item.ad_title }}</td>
-                                                <td>{{ item.ad_department }}</td>
-                                                <td>{{ item.ad_mobile }}</td>
-                                                <td>{{ item.href }}</td>
-                                                <td>{{ item.etag }}</td>
-                                                <td>{{ item.update_time }}</td>
+                                                <td>{{ item.nickname }}</td>
+                                                <td>{{ item.username }}</td>
+                                                {% for p in perm %}
+                                                    {% if item.perm_id == p.id %}
+                                                        <td>{{ p.describe }}</td>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <td>{{ item.create_time }}</td>
                                                 <td>
                                                     <div class="tpl-table-black-operation">
-{#                                                        <a href="javascript:;">#}
-{#                                                            <i class="am-icon-edit"></i> 编辑#}
-{#                                                        </a>#}
+                                                        <a href="javascript:;">
+                                                            <i class="am-icon-edit"></i> 编辑
+                                                        </a>
                                                         <a class="tpl-table-black-operation-del" onclick="deleteById({{ item.id }})">
                                                             <i class="am-icon-trash"></i> 删除
                                                         </a>
@@ -108,23 +90,23 @@
                                     <div class="am-fr">
                                         <ul class="am-pagination tpl-pagination">
                                             {% if data.has_previous %}
-                                                <li><a href="/naList?page={{ data.previous_page_number }}">«</a></li>
+                                                <li><a href="/userList?page={{ data.previous_page_number }}">«</a></li>
                                             {% else %}
                                                 <li><a href="#">«</a></li>
                                             {% endif %}
                                             {% for p in page_range %}
                                                 {% if p == data.number %}
                                                     <li class="am-active">
-                                                        <a href="/naList?page={{ p }}">{{ p }}</a>
+                                                        <a href="/userList?page={{ p }}">{{ p }}</a>
                                                     </li>
                                                 {% else %}
                                                     <li>
-                                                        <a href="/naList?page={{ p }}">{{ p }}</a>
+                                                        <a href="/userList?page={{ p }}">{{ p }}</a>
                                                     </li>
                                                 {% endif %}
                                             {% endfor %}
                                             {% if data.has_next %}
-                                                <li><a href="/naList?page={{ data.next_page_number }}">»</a></li>
+                                                <li><a href="/userList?page={{ data.next_page_number }}">»</a></li>
                                             {% else %}
                                                 <li><a href="#">»</a></li>
                                             {% endif %}
@@ -140,7 +122,7 @@
     <script type="text/javascript">
         function deleteById(id) {
             $.ajax({
-                url: '/naDelete',
+                url: '/userDelete',
                 method: 'post',
                 data: {'id': id, 'csrfmiddlewaretoken': '{{csrf_token}}'},
                 dataType: 'json',
@@ -151,21 +133,5 @@
                 }
             });
         };
-        function addNa() {
-            window.location.href = '/naAdd'
-        };
-        function search() {
-            var t = $('#type').val();
-            var q = $('#query').val();
-            if (q != '') {
-                $.get('/naList', {'type': t, 'query': q}, function (data) {
-                    window.location.href = '/naList?type=' + t + '&query=' + q;
-                })
-            } else {
-                $.get('/naList', {'type': t}, function (data) {
-                    window.location.href = '/naList?type=' + t;
-                })
-            }
-        }
     </script>
 {% endblock %}
