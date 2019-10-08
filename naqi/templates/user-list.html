@@ -15,7 +15,7 @@
                                     <div class="am-form-group">
                                         <div class="am-btn-toolbar">
                                             <div class="am-btn-group am-btn-group-xs">
-                                                <button type="button" class="am-btn am-btn-default am-btn-success">
+                                                <button type="button" class="am-btn am-btn-default am-btn-success" onclick="addUser()">
                                                     <span class="am-icon-plus"></span>
                                                     新增
                                                 </button>
@@ -73,7 +73,7 @@
                                                 <td>{{ item.create_time }}</td>
                                                 <td>
                                                     <div class="tpl-table-black-operation">
-                                                        <a href="javascript:;">
+                                                        <a onclick="editUser({{ item.id }})">
                                                             <i class="am-icon-edit"></i> 编辑
                                                         </a>
                                                         <a class="tpl-table-black-operation-del" onclick="deleteById({{ item.id }})">
@@ -129,9 +129,19 @@
                 success: function (data) {
                     if (data.code === 0 && data.msg == 'success'){
                         window.location.reload()
+                    } else {
+                        window.location.href = '/403'
                     }
                 }
             });
         };
+        function addUser() {
+            window.location.href = '/userAdd'
+        };
+        function editUser(id) {
+            $.get('/userUpdate', {'id': id}, function (data) {
+                window.location.href = '/userUpdate?id=' + id
+            })
+        }
     </script>
 {% endblock %}

@@ -9,4 +9,3 @@ def create_rsa_key():
     with open('./pub.pem', 'wb') as f:
         f.write(pub_key)
 
-create_rsa_key()

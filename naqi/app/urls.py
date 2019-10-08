@@ -16,8 +16,10 @@ Including another URLconf
 # from django.contrib import admin
 from django.urls import path
 from app.views import login, \
-    index, create_user, nalist, \
-    logout, delete_nalist, add_nalist, user_list, user_delete
+    index, user_add, nalist, \
+    logout, delete_nalist, add_nalist, \
+    user_list, user_delete, forbidden, \
+    user_update
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -25,10 +27,12 @@ urlpatterns = [
     path('login', login),
     path('logout', logout),
     path('index', index),
-    path('create', create_user),
     path('naList', nalist),
     path('naDelete', delete_nalist),
     path('naAdd', add_nalist),
     path('userList', user_list),
     path('userDelete', user_delete),
+    path('userAdd', user_add),
+    path('userUpdate', user_update),
+    path('403', forbidden),
 ]

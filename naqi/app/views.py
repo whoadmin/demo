@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, HttpResponse
 from utils.encrypt import decrypt_data, SHA256
 import base64
 from .models import Account, Nac, Perm
-from .auth import check_login
+from .auth import check_login, check_perm
 from django.core.paginator import Paginator, EmptyPage
 from django.http.response import JsonResponse
 import time
@@ -68,6 +68,7 @@ def nalist(request):
         'page_range': paginator.page_range,
         'u': u
     }
+    print(u)
     return render(request, 'na-list.html', ret)
 
 @check_login
@@ -97,7 +98,6 @@ def user_list(request):
     try:
         paginator = Paginator(users, 25)
         page = request.GET.get('page', 1)
-        u = request.session['user']
         data = paginator.page(page)
     except EmptyPage:
         data = paginator.page(paginator.num_pages)
@@ -110,37 +110,93 @@ def user_list(request):
     ret = {
         'data': data,
         'page_range': paginator.page_range,
-        'u': u,
+        'u': request.session['user'],
         'perm': perm
     }
     return render(request, 'user-list.html', ret)
 
 @check_login
 def user_delete(request):
+    user = request.session['user']
     data = {
         'code': 1,
         'msg': 'failed',
         'ret': None,
     }
-    if request.method == "POST":
-        id = request.POST.get('id', None)
-        if id != None:
-            res = Account.objects.get(id=id).delete()
-            if res:
-                data['code'] = 0
-                data['msg'] = 'success'
-                data['ret'] = res
-    return JsonResponse(data)
+    if check_perm(user):
+        if request.method == "POST":
+            id = request.POST.get('id', None)
+            if id != None:
+                res = Account.objects.get(id=id).delete()
+                if res:
+                    data['code'] = 0
+                    data['msg'] = 'success'
+                    data['ret'] = res
+        return JsonResponse(data)
+    else:
+        return JsonResponse(data)
 
-def create_user(request):
-    t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    a = Account.objects.create(
-        username='admin',
-        password=SHA256(b'admin'),
-        nickname='admin',
-        create_time=t,
-        perm_id=1
-    )
+@check_login
+def forbidden(request):
+    return render(request, '403.html')
+
+@check_login
+def user_update(request):
+    user = request.session['user']
+    id = request.GET.get('id', None)
+    if id != None:
+        account = Account.objects.get(id=id)
+        perm = Perm.objects.all()
+        ret = {
+            'account': account,
+            'perm': perm
+        }
+    if request.method == "POST":
+        if check_perm(user):
+            id = request.POST.get('id', None)
+            nickname = request.POST.get('nickname', None)
+            username = request.POST.get('username', None)
+            password = request.POST.get('password', None)
+            perm = request.POST.get('perm', None)
+            t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            a = Account.objects.get(id=id)
+            a.username = username
+            a.nickname = nickname
+            a.password = SHA256(password.encode())
+            a.perm_id = perm
+            a.create_time = t
+            a.save()
+            return redirect('/userList')
+        else:
+            return redirect('/403')
+    return render(request, 'user-update.html', ret)
+
+@check_login
+def user_add(request):
+    u = request.session['user']
+    perm = Perm.objects.all()
+    ret = {
+        'u': u,
+        'perm': perm
+    }
+    if check_perm(u):
+        if request.method == "POST":
+            nickname = request.POST.get('nickname', None)
+            username = request.POST.get('username', None)
+            password = request.POST.get('password', None)
+            perm = request.POST.get('perm', None)
+            t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            r = Account.objects.create(
+                username=username,
+                password=SHA256(password.encode()),
+                nickname=nickname,
+                create_time=t,
+                perm_id=perm
+            )
+            print(r.check())
+            return redirect('/userList')
+    else:
+        return redirect('/403')
     # print(SHA256(b'admin'))
-    return HttpResponse('create success')
+    return render(request, 'user-add.html', ret)
 
