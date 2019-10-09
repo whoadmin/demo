@@ -63,12 +63,31 @@ def nalist(request):
         data = paginator.page(paginator.num_pages)
     except Exception:
         data = paginator.page(1)
+    # 构建page_range
+    max_page_count = 11
+    max_page_count_half = int(max_page_count / 2)
+    # 判断页数是否大于max_page_count
+    page = int(page)
+    if paginator.num_pages >= max_page_count:
+        # 得出start位置
+        if page <= max_page_count_half:
+            page_start = 1
+            page_end = max_page_count + 1
+        else:
+            if page + max_page_count_half + 1 > paginator.num_pages:
+                page_start = paginator.num_pages - max_page_count
+                page_end = paginator.num_pages + 1
+            else:
+                page_start = page - max_page_count_half
+                page_end = page + max_page_count_half + 1
+        page_range = range(page_start, page_end)
+    else:
+        page_range = paginator.page_range
     ret = {
         'data': data,
-        'page_range': paginator.page_range,
+        'page_range': page_range,
         'u': u
     }
-    print(u)
     return render(request, 'na-list.html', ret)
 
 @check_login
@@ -107,11 +126,32 @@ def user_list(request):
     for u in users:
         p = Perm.objects.get(id=u.perm_id)
         perm.append(p)
+    # 构建page_range
+    max_page_count = 11
+    max_page_count_half = int(max_page_count / 2)
+    # 判断页数是否大于max_page_count
+    page = int(page)
+    if paginator.num_pages >= max_page_count:
+        # 得出start位置
+        if page <= max_page_count_half:
+            page_start = 1
+            page_end = max_page_count + 1
+        else:
+            if page + max_page_count_half + 1 > paginator.num_pages:
+                page_start = paginator.num_pages - max_page_count
+                page_end = paginator.num_pages + 1
+            else:
+                page_start = page - max_page_count_half
+                page_end = page + max_page_count_half + 1
+        page_range = range(page_start, page_end)
+    else:
+        page_range = paginator.page_range
     ret = {
         'data': data,
-        'page_range': paginator.page_range,
+        'page_range': page_range,
         'u': request.session['user'],
-        'perm': perm
+        'perm': perm,
+        'count': paginator.num_pages
     }
     return render(request, 'user-list.html', ret)
 
@@ -193,7 +233,6 @@ def user_add(request):
                 create_time=t,
                 perm_id=perm
             )
-            print(r.check())
             return redirect('/userList')
     else:
         return redirect('/403')
